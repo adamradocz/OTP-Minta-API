@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Extensions.Logging;
 using Otp.API.Models;
 using Otp.API.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,18 +15,18 @@ namespace Otp.API.Controllers
     public class DokumentumokController : ControllerBase
     {
         private readonly ILogger<DokumentumokController> _logger;
-        private readonly IDokumentumokService _dokumentumokRepository;
+        private readonly IDokumentumokService _dokumentumokService;
 
-        public DokumentumokController(ILogger<DokumentumokController> logger, IDokumentumokService dokumentumokRepository)
+        public DokumentumokController(ILogger<DokumentumokController> logger, IDokumentumokService dokumentumokService)
         {
-            _logger = logger;
-            _dokumentumokRepository = dokumentumokRepository;
+            _logger = logger ?? throw new NullReferenceException();
+            _dokumentumokService = dokumentumokService ?? throw new NullReferenceException();
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<string>> GetDokumentumok()
         {
-            return Ok(_dokumentumokRepository.GetDokumentumok());
+            return Ok(_dokumentumokService.GetDokumentumok());
         }
 
         [HttpGet("{*fileName}", Name = "GetDokumentum")]
@@ -34,7 +35,7 @@ namespace Otp.API.Controllers
         {
             if (Request.Method.Equals("HEAD"))
             {
-                var fileSize = _dokumentumokRepository.GetFileSize(fileName);
+                var fileSize = _dokumentumokService.GetFileSize(fileName);
                 if (fileSize == null)
                 {
                     _logger.LogWarning($"Fájl nem létezik vagy érvénytelen fájlnév: {fileName}");
@@ -45,7 +46,7 @@ namespace Otp.API.Controllers
                 return Ok();
             }
 
-            var file = await _dokumentumokRepository.GetDokumentum(fileName);
+            var file = await _dokumentumokService.GetDokumentum(fileName);
 
             if (file == null)
             {
@@ -59,7 +60,7 @@ namespace Otp.API.Controllers
         [HttpPost("{*fileName}")]
         public async Task<ActionResult<string>> PostDokumentum(string fileName, [FromBody] string file)
         {
-            var response = await _dokumentumokRepository.PostDokumentum(fileName, file);
+            var response = await _dokumentumokService.PostDokumentum(fileName, file);
             bool success = response.Item1;
             string message = response.Item2;
 
@@ -75,7 +76,7 @@ namespace Otp.API.Controllers
         [HttpOptions]
         public IActionResult GetDokumentumokOptions()
         {
-            Response.Headers.Add("Allow", "GET,OPTIONS,POST");
+            Response.Headers.Add("Allow", "GET,OPTIONS,POST,HEAD");
             return Ok();
         }
     }

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otp.API", "Otp.API\Otp.API.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otp.API.Tests", "Otp.API.Tests\Otp.API.Tests.csproj", "{218D019E-EA59-4301-8669-33DA5549729A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otp.WindowsForms", "Otp.WindowsForms\Otp.WindowsForms.csproj", "{B6A9E59E-982F-4753-83D0-10AAF25E3FC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otp.WindowsForms", "Otp.WindowsForms\Otp.WindowsForms.csproj", "{01126A5C-5199-4C52-895C-99BDED03B867}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DF4F9FEA-AD08-4DA8-9C75-337C7424D3D9} = {DF4F9FEA-AD08-4DA8-9C75-337C7424D3D9}
 	EndProjectSection
@@ -26,10 +26,10 @@ Global
 		{218D019E-EA59-4301-8669-33DA5549729A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{218D019E-EA59-4301-8669-33DA5549729A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{218D019E-EA59-4301-8669-33DA5549729A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6A9E59E-982F-4753-83D0-10AAF25E3FC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6A9E59E-982F-4753-83D0-10AAF25E3FC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6A9E59E-982F-4753-83D0-10AAF25E3FC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6A9E59E-982F-4753-83D0-10AAF25E3FC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01126A5C-5199-4C52-895C-99BDED03B867}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01126A5C-5199-4C52-895C-99BDED03B867}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01126A5C-5199-4C52-895C-99BDED03B867}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01126A5C-5199-4C52-895C-99BDED03B867}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

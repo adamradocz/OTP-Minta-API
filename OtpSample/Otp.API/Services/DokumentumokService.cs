@@ -75,8 +75,7 @@ namespace Otp.API.Services
                 return null;
             }
 
-            var fileInfo = new System.IO.FileInfo(filePath);
-            return fileInfo.Length;
+            return _fileSystem.FileInfo.FromFileName(filePath).Length;
         }
 
         public async Task<(bool, string)> PostDokumentum(string relativeFilePath, string file)

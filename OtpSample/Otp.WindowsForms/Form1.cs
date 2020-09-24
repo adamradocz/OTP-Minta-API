@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,9 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Schema;
 
 namespace Otp.WindowsForms
 {
@@ -33,7 +33,7 @@ namespace Otp.WindowsForms
             if (response.IsSuccessStatusCode)
             {
                 var jsonContent = await response.Content.ReadAsStringAsync();
-                var fileSystemEntities = JsonConvert.DeserializeObject<string[]>(jsonContent);
+                var fileSystemEntities = JsonSerializer.Deserialize<string[]>(jsonContent);
                 textBoxInfo.Text = string.Join(Environment.NewLine, fileSystemEntities);
             }
             else
@@ -79,20 +79,6 @@ namespace Otp.WindowsForms
             }
         }
 
-        private void buttonDokumentumSelect_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Title = "Dokumentum feltöltése";
-            openFileDialog.Filter = _dialogBoxFiler;
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                textBoxSelectedDokumentum.Text = openFileDialog.FileName;
-                string previousFileName = Path.GetFileName(textBoxAddress.Text);
-                textBoxAddress.Text = textBoxAddress.Text.TrimEnd(previousFileName.ToCharArray()) + Path.GetFileName(openFileDialog.FileName);
-            }
-        }
-
         private async void buttonDokumentumUpload_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBoxSelectedDokumentum.Text))
@@ -114,8 +100,8 @@ namespace Otp.WindowsForms
 
             var fileData = File.ReadAllBytes(textBoxSelectedDokumentum.Text);
             var base64File = Convert.ToBase64String(fileData);
-            var stringContent = new StringContent(JsonConvert.SerializeObject(base64File), Encoding.UTF8, "application/json");
-            
+            var stringContent = new StringContent(JsonSerializer.Serialize(base64File), Encoding.UTF8, "application/json");
+
             HttpResponseMessage response = await _client.PostAsync(textBoxAddress.Text, stringContent);
             if (!response.IsSuccessStatusCode)
             {
@@ -123,6 +109,20 @@ namespace Otp.WindowsForms
             }
 
             textBoxInfo.Text = await response.Content.ReadAsStringAsync();
+        }
+
+        private void buttonDokumentumSelect_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Dokumentum feltöltése";
+            openFileDialog.Filter = _dialogBoxFiler;
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                textBoxSelectedDokumentum.Text = openFileDialog.FileName;
+                string previousFileName = Path.GetFileName(textBoxAddress.Text);
+                textBoxAddress.Text = textBoxAddress.Text.TrimEnd(previousFileName.ToCharArray()) + Path.GetFileName(openFileDialog.FileName);
+            }
         }
 
         private void SetInfoTextBoxErrorColor()
@@ -133,6 +133,40 @@ namespace Otp.WindowsForms
         private void SetInfoTextBoxDefaultColor()
         {
             textBoxInfo.ForeColor = Color.Black;
+        }
+
+        private async void buttonDokumentumGetSize_Click(object sender, EventArgs e)
+        {
+            
+            var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Head, textBoxAddress.Text));
+            if (response.IsSuccessStatusCode)
+            {
+                SetInfoTextBoxDefaultColor();
+                textBoxInfo.Text = "Töltés...";
+                var contentLenght = response.Content.Headers.ContentLength;
+
+                textBoxInfo.Text = $"Fájlméret: {ConvertBytesToFileSize(contentLenght)}";
+            }
+            else
+            {
+                SetInfoTextBoxErrorColor();
+                textBoxInfo.Text = await response.Content.ReadAsStringAsync();
+            }
+        }
+
+        public static string ConvertBytesToFileSize(long? length)
+        {
+            length ??= 0;
+
+            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            int order = 0;
+            while (length >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                length /= 1024;
+            }
+
+            return string.Format("{0:0.##} {1}", length, sizes[order]);
         }
     }
 }

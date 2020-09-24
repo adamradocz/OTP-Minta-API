@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -14,24 +15,23 @@ namespace Otp.API.Tests
     public class DokumentumokServiceTests
     {
         private const string DokumentumokPath = @"c:\Dokumentumok\";
-
         private readonly Mock<IOptions<DokumentumokConfiguration>> _options;
-        private readonly MockFileSystem _fileSystem;
 
         public DokumentumokServiceTests()
         {
             DokumentumokConfiguration dokumentumokConfiguration = new DokumentumokConfiguration() { Path = DokumentumokPath };
             _options = new Mock<IOptions<DokumentumokConfiguration>>();
             _options.Setup(conf => conf.Value).Returns(dokumentumokConfiguration);
-
-            _fileSystem = new MockFileSystem();
         }
 
         [Fact]
         public void DokumentumokService_IOptionsIsNull_ThrowsNullReferenceException()
         {
+            // Arrange
+            var fileSystem = new MockFileSystem();
+
             // Assert
-            Assert.Throws<NullReferenceException>(() => new DokumentumokService(null, _fileSystem));
+            Assert.Throws<NullReferenceException>(() => new DokumentumokService(null, fileSystem));
         }
         
         [Fact]
@@ -44,16 +44,20 @@ namespace Otp.API.Tests
         [Fact]
         public void DokumentumokService_DokumentumokConfigurationPathDoesntExist_ThrowsArgumentException()
         {
+            // Arrange
+            var fileSystem = new MockFileSystem();
+
             // Assert
-            Assert.Throws<ArgumentException>(() => new DokumentumokService(_options.Object, _fileSystem));
+            Assert.Throws<ArgumentException>(() => new DokumentumokService(_options.Object, fileSystem));
         }
         
         [Fact]
         public void GetDokumentumok_EmptyDokumentumokFolder_ReturnsEmptyIEnumerable()
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
 
             // Act
             var fileSystemEntries = service.GetDokumentumok();
@@ -68,8 +72,9 @@ namespace Otp.API.Tests
         public void GetDokumentumok_TrimDokumentumokDirectory_ReturnRelativeEntriesPath(string fileName)
         {
             // Arrange
-            _fileSystem.AddFile(Path.Combine(DokumentumokPath, fileName), new MockFileData("Lorem ipsum."));
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddFile(Path.Combine(DokumentumokPath, fileName), new MockFileData("Lorem ipsum."));
+            var service = new DokumentumokService(_options.Object, fileSystem);
 
             // Act
             var fileSystemEntries = service.GetDokumentumok().ToArray();
@@ -86,8 +91,9 @@ namespace Otp.API.Tests
         public async Task GetDokumentum_InvalidFileName_ReturnsNull(string requiredDokumentumName)
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
 
             // Act
             var dokumentum = await service.GetDokumentum(requiredDokumentumName);
@@ -100,8 +106,9 @@ namespace Otp.API.Tests
         public async Task GetDokumentum_FileDoesntExist_ReturnsNull()
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
             var requiredDokumentumName = "non-existing.txt";
 
             // Act
@@ -116,8 +123,9 @@ namespace Otp.API.Tests
         {
             // Arrange
             var emptyFileName = "empty-file.txt";
-            _fileSystem.AddFile(Path.Combine(DokumentumokPath, emptyFileName), new MockFileData(""));
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddFile(Path.Combine(DokumentumokPath, emptyFileName), new MockFileData(""));
+            var service = new DokumentumokService(_options.Object, fileSystem);
 
             // Act
             var dokumentum = await service.GetDokumentum(emptyFileName);
@@ -137,8 +145,9 @@ namespace Otp.API.Tests
         public async Task GetDokumentum_SubFolderFile_ReturnsNotEmpty(string filePath)
         {
             // Arrange
-            _fileSystem.AddFile(Path.Combine(DokumentumokPath, filePath), new MockFileData("Lorem ipsum."));
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddFile(Path.Combine(DokumentumokPath, filePath), new MockFileData("Lorem ipsum."));
+            var service = new DokumentumokService(_options.Object, fileSystem);
 
             // Act
             var dokumentum = await service.GetDokumentum(filePath);
@@ -151,8 +160,9 @@ namespace Otp.API.Tests
         public void GetFileSize_FileDoesntExist_ReturnsNull()
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
             string filName = "non-existing.txt";
 
             // Act
@@ -170,12 +180,15 @@ namespace Otp.API.Tests
         public async Task PostDokumentum_InvalidFileName_ReturnsFalse(string fileName)
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
-            string base64File = "TG9yZW0gaXBzdW0u"; // Base64: "Lorem ipsum."
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
+            
+            var fileData = "Lorem ipsum.";
+            string convertedFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileData));
 
             // Act
-            var response = await service.PostDokumentum(fileName, base64File);
+            var response = await service.PostDokumentum(fileName, convertedFile);
 
             // Assert
             Assert.False(response.Item1);
@@ -185,13 +198,16 @@ namespace Otp.API.Tests
         public async Task PostDokumentum_InvalidDirectoryName_ReturnsFalse()
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
             string relativeFilePath = "Invalid:Dir/test.txt";
-            string base64File = "TG9yZW0gaXBzdW0u"; // Base64: "Lorem ipsum."
+            
+            var fileData = "Lorem ipsum.";
+            string convertedFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileData));
 
             // Act
-            var response = await service.PostDokumentum(relativeFilePath, base64File);
+            var response = await service.PostDokumentum(relativeFilePath, convertedFile);
 
             // Assert
             Assert.False(response.Item1);
@@ -201,13 +217,16 @@ namespace Otp.API.Tests
         public async Task PostDokumentum_UploadToNonExistingSubDirectory_ReturnsFalse()
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
             string relativeFilePath = "NonExistingDir/test.txt";
-            string base64File = "TG9yZW0gaXBzdW0u"; // Base64: "Lorem ipsum."
+
+            var fileData = "Lorem ipsum.";
+            string convertedFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileData));
 
             // Act
-            var response = await service.PostDokumentum(relativeFilePath, base64File);
+            var response = await service.PostDokumentum(relativeFilePath, convertedFile);
 
             // Assert
             Assert.False(response.Item1);
@@ -226,12 +245,15 @@ namespace Otp.API.Tests
         {
             // Arrange
             string absoluteDirectoryPath = Path.Combine(DokumentumokPath, directoryPath);
-            _fileSystem.AddDirectory(absoluteDirectoryPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
-            string base64File = "TG9yZW0gaXBzdW0u"; // Base64: "Lorem ipsum."
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(absoluteDirectoryPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
+
+            var fileData = "Lorem ipsum.";
+            string convertedFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileData));
 
             // Act
-            var response = await service.PostDokumentum(fileName, base64File);
+            var response = await service.PostDokumentum(fileName, convertedFile);
 
             // Assert
             Assert.True(response.Item1);
@@ -241,13 +263,14 @@ namespace Otp.API.Tests
         public async Task PostDokumentum_UploadZeroSizedFile_ReturnsTrue()
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
             string fileName = "test.txt";
-            string base64File = "";
+            string convertedFile = "";
 
             // Act
-            var response = await service.PostDokumentum(fileName, base64File);
+            var response = await service.PostDokumentum(fileName, convertedFile);
 
             // Assert
             Assert.True(response.Item1);
@@ -257,13 +280,14 @@ namespace Otp.API.Tests
         public async Task PostDokumentum_UploadBadCodedFile_ReturnsFalse()
         {
             // Arrange
-            _fileSystem.AddDirectory(DokumentumokPath);
-            var service = new DokumentumokService(_options.Object, _fileSystem);
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(DokumentumokPath);
+            var service = new DokumentumokService(_options.Object, fileSystem);
             string fileName = "test.txt";
-            string worngBase64File = "AAAAAAA";
+            string wrongConvertedFile = "AAAAAAA";
 
             // Act
-            var response = await service.PostDokumentum(fileName, worngBase64File);
+            var response = await service.PostDokumentum(fileName, wrongConvertedFile);
 
             // Assert
             Assert.False(response.Item1);
