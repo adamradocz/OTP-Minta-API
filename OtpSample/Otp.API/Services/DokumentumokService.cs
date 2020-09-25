@@ -57,7 +57,7 @@ namespace Otp.API.Services
                 return null;
             }
 
-            return await Helpers.FileConverter.ConvertToBase64Async(_fileSystem, filePath);
+            return await FileProcessor.Encoder.EncodeToBase64Async(_fileSystem, filePath);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Otp.API.Services
 
             try
             {
-                await Helpers.FileConverter.ConvertFromBase64Async(_fileSystem, absoluteFilePath, file);
+                await FileProcessor.Encoder.DecodeFromBase64Async(_fileSystem, absoluteFilePath, file);
             }
             catch (Exception exception)
             {

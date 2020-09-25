@@ -2,16 +2,16 @@
 using System.IO.Abstractions;
 using System.Threading.Tasks;
 
-namespace Otp.API.Helpers
+namespace FileProcessor
 {
-    public static class FileConverter
+    public static class Encoder
     {
         /// <summary>
         /// Convert a file to Base64 string.
         /// </summary>
         /// <param name="filePath">Path of the file.</param>
         /// <returns>Base64 coded string.</returns>
-        public static async Task<string> ConvertToBase64Async(IFileSystem fileSystem, string filePath)
+        public static async Task<string> EncodeToBase64Async(IFileSystem fileSystem, string filePath)
         {
             var fileData = await fileSystem.File.ReadAllBytesAsync(filePath);
             return Convert.ToBase64String(fileData);
@@ -22,7 +22,7 @@ namespace Otp.API.Helpers
         /// </summary>
         /// <param name="path">File name.</param>
         /// <param name="base64String">Base64 encoded string.</param>
-        public static async Task ConvertFromBase64Async(IFileSystem fileSystem, string path, string base64String)
+        public static async Task DecodeFromBase64Async(IFileSystem fileSystem, string path, string base64String)
         {
             await fileSystem.File.WriteAllBytesAsync(path, Convert.FromBase64String(base64String));
         }

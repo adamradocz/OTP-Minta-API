@@ -1,6 +1,6 @@
 ﻿namespace Otp.WindowsForms
 {
-    partial class Form1
+    partial class MainView
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.labelApiAddress = new System.Windows.Forms.Label();
             this.textBoxAddress = new System.Windows.Forms.TextBox();
             this.labelSelectedDokumentum = new System.Windows.Forms.Label();
@@ -36,8 +37,10 @@
             this.buttonGetDokumentumok = new System.Windows.Forms.Button();
             this.buttonDokumentumDownload = new System.Windows.Forms.Button();
             this.buttonDokumentumUpload = new System.Windows.Forms.Button();
-            this.textBoxInfo = new System.Windows.Forms.TextBox();
             this.buttonDokumentumGetSize = new System.Windows.Forms.Button();
+            this.listBoxMessages = new System.Windows.Forms.ListBox();
+            this.errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).BeginInit();
             this.SuspendLayout();
             // 
             // labelApiAddress
@@ -51,9 +54,11 @@
             // 
             // textBoxAddress
             // 
+            this.textBoxAddress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxAddress.Location = new System.Drawing.Point(80, 6);
             this.textBoxAddress.Name = "textBoxAddress";
-            this.textBoxAddress.Size = new System.Drawing.Size(708, 27);
+            this.textBoxAddress.Size = new System.Drawing.Size(688, 27);
             this.textBoxAddress.TabIndex = 1;
             this.textBoxAddress.Text = "http://localhost/api/dokumentumok/";
             // 
@@ -68,6 +73,8 @@
             // 
             // textBoxSelectedDokumentum
             // 
+            this.textBoxSelectedDokumentum.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxSelectedDokumentum.Location = new System.Drawing.Point(198, 42);
             this.textBoxSelectedDokumentum.Name = "textBoxSelectedDokumentum";
             this.textBoxSelectedDokumentum.ReadOnly = true;
@@ -76,6 +83,7 @@
             // 
             // buttonDokumentumSelect
             // 
+            this.buttonDokumentumSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonDokumentumSelect.Location = new System.Drawing.Point(694, 41);
             this.buttonDokumentumSelect.Name = "buttonDokumentumSelect";
             this.buttonDokumentumSelect.Size = new System.Drawing.Size(94, 29);
@@ -114,16 +122,6 @@
             this.buttonDokumentumUpload.UseVisualStyleBackColor = true;
             this.buttonDokumentumUpload.Click += new System.EventHandler(this.buttonDokumentumUpload_Click);
             // 
-            // textBoxInfo
-            // 
-            this.textBoxInfo.BackColor = System.Drawing.SystemColors.Window;
-            this.textBoxInfo.Location = new System.Drawing.Point(12, 139);
-            this.textBoxInfo.Multiline = true;
-            this.textBoxInfo.Name = "textBoxInfo";
-            this.textBoxInfo.ReadOnly = true;
-            this.textBoxInfo.Size = new System.Drawing.Size(776, 299);
-            this.textBoxInfo.TabIndex = 8;
-            // 
             // buttonDokumentumGetSize
             // 
             this.buttonDokumentumGetSize.Location = new System.Drawing.Point(384, 82);
@@ -134,13 +132,30 @@
             this.buttonDokumentumGetSize.UseVisualStyleBackColor = true;
             this.buttonDokumentumGetSize.Click += new System.EventHandler(this.buttonDokumentumGetSize_Click);
             // 
-            // Form1
+            // listBoxMessages
+            // 
+            this.listBoxMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBoxMessages.FormattingEnabled = true;
+            this.listBoxMessages.HorizontalScrollbar = true;
+            this.listBoxMessages.ItemHeight = 20;
+            this.listBoxMessages.Location = new System.Drawing.Point(12, 139);
+            this.listBoxMessages.Name = "listBoxMessages";
+            this.listBoxMessages.Size = new System.Drawing.Size(776, 304);
+            this.listBoxMessages.TabIndex = 10;
+            // 
+            // errorProvider
+            // 
+            this.errorProvider.ContainerControl = this;
+            // 
+            // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(797, 450);
+            this.Controls.Add(this.listBoxMessages);
             this.Controls.Add(this.buttonDokumentumGetSize);
-            this.Controls.Add(this.textBoxInfo);
             this.Controls.Add(this.buttonDokumentumUpload);
             this.Controls.Add(this.buttonDokumentumDownload);
             this.Controls.Add(this.buttonGetDokumentumok);
@@ -149,8 +164,10 @@
             this.Controls.Add(this.labelSelectedDokumentum);
             this.Controls.Add(this.textBoxAddress);
             this.Controls.Add(this.labelApiAddress);
-            this.Name = "Form1";
+            this.MinimumSize = new System.Drawing.Size(815, 497);
+            this.Name = "MainView";
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -166,8 +183,9 @@
         private System.Windows.Forms.Button buttonGetDokumentumok;
         private System.Windows.Forms.Button buttonDokumentumDownload;
         private System.Windows.Forms.Button buttonDokumentumUpload;
-        private System.Windows.Forms.TextBox textBoxInfo;
         private System.Windows.Forms.Button buttonDokumentumGetSize;
+        private System.Windows.Forms.ListBox listBoxMessages;
+        private System.Windows.Forms.ErrorProvider errorProvider;
     }
 }
 

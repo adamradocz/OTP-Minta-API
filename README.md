@@ -1,18 +1,26 @@
 # OTP Minta API
 
+## Változások
+
+- `Otp.WindowsForms` .NET Core-t használ, ezért nincs szükség 3rd party JSON libraray-ra, plusz képes a fájlok méretének lekérdezésére.
+- `Otp.WindowsForms` MVP pattern-t használ, így ha szükséges az üzleti logika tesztelhető.
+- `DokumentumokController` tesztek hozzáadva.
+- `DokumentumokService` tesztek párhuzamos futtatásra optimalizálva.
+- `FileProcessor` .NET Standard Library hozzáadva, hogy a kódolás könnyen cserélhető legyen más formátumra.
+
 ## Követelmények
 
 - [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
-- API: [.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet/current)
-- Windows Forms: [.NET Framework 4.7.2](https://dotnet.microsoft.com/download/dotnet-framework/net472)
+- [.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet/current)
 
 ## Struktúra
 
 | Projekt | Infó |
 | :--- | :--- |
+| `FileProcessor` | .NET Standard 2.1 Library. Közös kód a fájlok kódolására.|
 | `Otp.API` | ASP.NET Core Web API |
 | `Otp.API.Tests` | ASP.NET Core Web API tesztek |
-| `Otp.WindowsForms` | Windows Forms Kliens applikáció |
+| `Otp.WindowsForms` | .NET Core Windows Forms Kliens applikáció |
 
 ## Konfiguráció
 
@@ -34,3 +42,7 @@ A konfigurációs fájl olvasásához [Options pattern](https://docs.microsoft.c
 Támogatott formátumok:
 - JSON
 - XML
+
+### WindowsForms Kliens
+
+A Kliens hagyja az érvénytelen inputot is megadni.

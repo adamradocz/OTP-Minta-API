@@ -5,7 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IO.Abstractions" Version="12.1.9" />
+    <PackageReference Include="System.IO.Abstractions" Version="12.1.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileConverter\FileProcessor.csproj" />
   </ItemGroup>
 
 
