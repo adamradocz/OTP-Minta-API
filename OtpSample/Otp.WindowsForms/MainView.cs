@@ -16,6 +16,7 @@ namespace Otp.WindowsForms
         public string[] Messages { set => listBoxMessages.DataSource = value; }
 
         private readonly MainPresenter _presenter;
+        private bool _apiAddressValid = true;
         private readonly string _dialogBoxFilter = "Minden fájl (*.*)|*.*|Text fájl|*.txt|PDF fájl|*.pdf";
 
         public MainView()
@@ -26,49 +27,43 @@ namespace Otp.WindowsForms
 
         private async void buttonGetDokumentumok_Click(object sender, EventArgs e)
         {
-            if (_presenter.UrlIsValid())
+            if (!_apiAddressValid)
             {
-                await _presenter.GetDokumentumokAsync();
+                return;
             }
-            else
-            {
-                errorProvider.SetError(textBoxAddress, "Érvénytelen API cím.");
-            }            
+
+            await _presenter.GetDokumentumokAsync();
         }
 
         private async void buttonDokumentumDownload_Click(object sender, EventArgs e)
         {
-            if (_presenter.UrlIsValid())
+            if (!_apiAddressValid)
             {
-                SaveFileDialog saveFileDialog = new SaveFileDialog
-                {
-                    Title = "Dokumentum mentése",
-                    Filter = _dialogBoxFilter,
-                    FileName = Path.GetFileName(textBoxAddress.Text)
-                };
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    DownloadFilePath = saveFileDialog.FileName;
-                    await _presenter.DownloadDokumentumAsync();
-                }
+                return;
             }
-            else
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                errorProvider.SetError(textBoxAddress, "Érvénytelen API cím.");
+                Title = "Dokumentum mentése",
+                Filter = _dialogBoxFilter,
+                FileName = Path.GetFileName(textBoxAddress.Text)
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                DownloadFilePath = saveFileDialog.FileName;
+                await _presenter.DownloadDokumentumAsync();
             }
         }
 
         private async void buttonDokumentumUpload_Click(object sender, EventArgs e)
         {
-            if (_presenter.UrlIsValid())
+            if (!_apiAddressValid)
             {
-                await _presenter.UploadDokumentumAsync();
+                return;
             }
-            else
-            {
-                errorProvider.SetError(textBoxAddress, "Érvénytelen API cím.");
-            }
+
+            await _presenter.UploadDokumentumAsync();
         }
 
         private void buttonDokumentumSelect_Click(object sender, EventArgs e)
@@ -89,13 +84,24 @@ namespace Otp.WindowsForms
 
         private async void buttonDokumentumGetSize_Click(object sender, EventArgs e)
         {
-            if (_presenter.UrlIsValid())
+            if (!_apiAddressValid)
             {
-                await _presenter.GetDokumentumSizeAsync();
+                return;
+            }
+
+            await _presenter.GetDokumentumSizeAsync();
+        }
+
+        private void textBoxAddress_TextChanged(object sender, EventArgs e)
+        {
+            if (!Uri.TryCreate(ApiAddress, UriKind.Absolute, out _))
+            {
+                errorProvider.SetError(textBoxAddress, "Érvénytelen API cím.");
+                _apiAddressValid = false;
             }
             else
             {
-                errorProvider.SetError(textBoxAddress, "Érvénytelen API cím.");
+                _apiAddressValid = true;
             }
         }
     }

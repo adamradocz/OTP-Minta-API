@@ -21,11 +21,6 @@ namespace Otp.WindowsForms.Presenters
             _view = view;
         }
 
-        public bool UrlIsValid()
-        {
-            return Uri.TryCreate(_view.ApiAddress, UriKind.Absolute, out _);
-        }
-
         public async Task GetDokumentumokAsync()
         {
             if (!string.IsNullOrEmpty(Path.GetFileName(_view.ApiAddress)))

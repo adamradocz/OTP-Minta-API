@@ -61,6 +61,7 @@
             this.textBoxAddress.Size = new System.Drawing.Size(688, 27);
             this.textBoxAddress.TabIndex = 1;
             this.textBoxAddress.Text = "http://localhost/api/dokumentumok/";
+            this.textBoxAddress.TextChanged += new System.EventHandler(this.textBoxAddress_TextChanged);
             // 
             // labelSelectedDokumentum
             // 
