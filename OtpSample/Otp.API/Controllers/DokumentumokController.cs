@@ -31,22 +31,8 @@ namespace Otp.API.Controllers
         }
 
         [HttpGet("{*fileName}", Name = "GetDokumentum")]
-        [HttpHead("{*fileName}")]
         public async Task<ActionResult<string>> GetDokumentum(string fileName, CancellationToken cancellationToken)
-        {   
-            if (Request.Method.Equals("HEAD"))
-            {
-                var fileSize = _dokumentumokService.GetFileSize(fileName);
-                if (fileSize == null)
-                {
-                    _logger.LogWarning($"Fájl nem létezik vagy érvénytelen fájlnév: {fileName}");
-                    return NotFound("Fájl nem létezik vagy érvénytelen fájlnév.");
-                }
-
-                Response.ContentLength = fileSize;
-                return Ok();
-            }
-
+        {
             string file;
             try
             {
@@ -65,6 +51,20 @@ namespace Otp.API.Controllers
             }
 
             return Ok(file);
+        }
+
+        [HttpHead("{*fileName}")]
+        public IActionResult GetDokumentum(string fileName)
+        {
+            var fileSize = _dokumentumokService.GetFileSize(fileName);
+            if (fileSize == null)
+            {
+                _logger.LogWarning($"Fájl nem létezik vagy érvénytelen fájlnév: {fileName}");
+                return NotFound("Fájl nem létezik vagy érvénytelen fájlnév.");
+            }
+
+            Response.ContentLength = fileSize;
+            return Ok();
         }
 
         [HttpPost("{*fileName}")]

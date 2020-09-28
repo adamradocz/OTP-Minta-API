@@ -137,7 +137,7 @@ namespace Otp.API.Tests
         }
 
         [Fact]
-        public async Task GetDokumentum_InvalidFileSizeRequest_ReturnsNotFound()
+        public void GetDokumentum_InvalidFileSizeRequest_ReturnsNotFound()
         {
             // Arrange
             var fileSystem = new MockFileSystem();
@@ -153,13 +153,12 @@ namespace Otp.API.Tests
                 }
             };
             controller.ControllerContext.HttpContext.Request.Method = "HEAD";
-            var cancellationToken = new CancellationToken();
 
             // Act
-            var result = await controller.GetDokumentum(fileName, cancellationToken);
+            var result = controller.GetDokumentum(fileName);
 
             // Assert
-            Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
@@ -194,7 +193,7 @@ namespace Otp.API.Tests
         }
 
         [Fact]
-        public async Task GetDokumentum_ValidFileSizeRequest_ReturnsFileSizeAsContentLength()
+        public void GetDokumentum_ValidFileSizeRequest_ReturnsFileSizeAsContentLength()
         {
             // Arrange
             var fileSystem = new MockFileSystem();
@@ -214,14 +213,13 @@ namespace Otp.API.Tests
             controller.ControllerContext.HttpContext.Request.Method = "HEAD";
 
             var expectedFileSize = fileSystem.FileInfo.FromFileName(filePath).Length;
-            var cancellationToken = new CancellationToken();
 
             // Act
-            var result = await controller.GetDokumentum(fileName, cancellationToken);
+            var result = controller.GetDokumentum(fileName);
             var actualFileSize = controller.Response.Headers["Content-Length"];
 
             // Assert
-            Assert.IsType<OkResult>(result.Result);
+            Assert.IsType<OkResult>(result);
             Assert.Equal(expectedFileSize, Convert.ToInt64(actualFileSize));
         }
 
