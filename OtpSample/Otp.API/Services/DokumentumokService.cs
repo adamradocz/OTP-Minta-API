@@ -3,6 +3,7 @@ using Otp.API.Models;
 using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Otp.API.Services
@@ -46,8 +47,9 @@ namespace Otp.API.Services
         /// If the file doesn't exist return null.
         /// </summary>
         /// <param name="fileName">File name</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Base64 encoded string or null</returns>
-        public async Task<string> GetDokumentum(string fileName)
+        public async Task<string> GetDokumentum(string fileName, CancellationToken cancellationToken)
         {
             string dokumentumokPath = _settings.Value.Path;
             string filePath = _fileSystem.Path.Combine(dokumentumokPath, fileName);
@@ -57,7 +59,7 @@ namespace Otp.API.Services
                 return null;
             }
 
-            return await FileProcessor.Encoder.EncodeToBase64Async(_fileSystem, filePath);
+            return await FileProcessor.Encoder.EncodeToBase64Async(_fileSystem, filePath, cancellationToken);
         }
 
         /// <summary>
@@ -78,7 +80,14 @@ namespace Otp.API.Services
             return _fileSystem.FileInfo.FromFileName(filePath).Length;
         }
 
-        public async Task<(bool, string)> PostDokumentum(string relativeFilePath, string file)
+        /// <summary>
+        /// Decode the base64 encoded string and write to a file.
+        /// </summary>
+        /// <param name="relativeFilePath">Relative file path.</param>
+        /// <param name="file">Base64 encoded string</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Tuple: (bool Success, string Message)</returns>
+        public async Task<(bool, string)> PostDokumentum(string relativeFilePath, string file, CancellationToken cancellationToken)
         {
             // Filename check
             if (string.IsNullOrWhiteSpace(relativeFilePath))
@@ -119,7 +128,7 @@ namespace Otp.API.Services
 
             try
             {
-                await FileProcessor.Encoder.DecodeFromBase64Async(_fileSystem, absoluteFilePath, file);
+                await FileProcessor.Encoder.DecodeFromBase64Async(_fileSystem, absoluteFilePath, file, cancellationToken);
             }
             catch (Exception exception)
             {

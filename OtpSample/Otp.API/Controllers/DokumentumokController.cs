@@ -6,6 +6,7 @@ using Otp.API.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Otp.API.Controllers
@@ -31,8 +32,8 @@ namespace Otp.API.Controllers
 
         [HttpGet("{*fileName}", Name = "GetDokumentum")]
         [HttpHead("{*fileName}")]
-        public async Task<ActionResult<string>> GetDokumentum(string fileName)
-        {
+        public async Task<ActionResult<string>> GetDokumentum(string fileName, CancellationToken cancellationToken)
+        {   
             if (Request.Method.Equals("HEAD"))
             {
                 var fileSize = _dokumentumokService.GetFileSize(fileName);
@@ -46,7 +47,16 @@ namespace Otp.API.Controllers
                 return Ok();
             }
 
-            var file = await _dokumentumokService.GetDokumentum(fileName);
+            string file;
+            try
+            {
+                file = await _dokumentumokService.GetDokumentum(fileName, cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogWarning($"Letöltés megszakítva: {fileName}");
+                file = "";
+            }
 
             if (file == null)
             {
@@ -58,9 +68,19 @@ namespace Otp.API.Controllers
         }
 
         [HttpPost("{*fileName}")]
-        public async Task<ActionResult<string>> PostDokumentum(string fileName, [FromBody] string file)
+        public async Task<ActionResult<string>> PostDokumentum(string fileName, [FromBody] string file, CancellationToken cancellationToken)
         {
-            var response = await _dokumentumokService.PostDokumentum(fileName, file);
+            (bool, string) response;
+            try
+            {
+                response = await _dokumentumokService.PostDokumentum(fileName, file, cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogWarning($"Feltöltés megszakítva: {fileName}");
+                return Ok("");
+            }
+            
             bool success = response.Item1;
             string message = response.Item2;
 

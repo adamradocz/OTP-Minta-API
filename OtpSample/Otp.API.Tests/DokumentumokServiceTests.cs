@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -94,9 +95,10 @@ namespace Otp.API.Tests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(DokumentumokPath);
             var service = new DokumentumokService(_options.Object, fileSystem);
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var dokumentum = await service.GetDokumentum(requiredDokumentumName);
+            var dokumentum = await service.GetDokumentum(requiredDokumentumName, cancellationToken);
 
             // Assert
             Assert.Null(dokumentum);
@@ -110,9 +112,10 @@ namespace Otp.API.Tests
             fileSystem.AddDirectory(DokumentumokPath);
             var service = new DokumentumokService(_options.Object, fileSystem);
             var requiredDokumentumName = "non-existing.txt";
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var dokumentum = await service.GetDokumentum(requiredDokumentumName);
+            var dokumentum = await service.GetDokumentum(requiredDokumentumName, cancellationToken);
 
             // Assert
             Assert.Null(dokumentum);
@@ -126,9 +129,10 @@ namespace Otp.API.Tests
             var fileSystem = new MockFileSystem();
             fileSystem.AddFile(Path.Combine(DokumentumokPath, emptyFileName), new MockFileData(""));
             var service = new DokumentumokService(_options.Object, fileSystem);
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var dokumentum = await service.GetDokumentum(emptyFileName);
+            var dokumentum = await service.GetDokumentum(emptyFileName, cancellationToken);
 
             // Assert
             Assert.Empty(dokumentum);
@@ -148,9 +152,10 @@ namespace Otp.API.Tests
             var fileSystem = new MockFileSystem();
             fileSystem.AddFile(Path.Combine(DokumentumokPath, filePath), new MockFileData("Lorem ipsum."));
             var service = new DokumentumokService(_options.Object, fileSystem);
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var dokumentum = await service.GetDokumentum(filePath);
+            var dokumentum = await service.GetDokumentum(filePath, cancellationToken);
 
             // Assert
             Assert.NotEmpty(dokumentum);
@@ -186,9 +191,10 @@ namespace Otp.API.Tests
             
             var fileData = "Lorem ipsum.";
             string convertedFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileData));
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var response = await service.PostDokumentum(fileName, convertedFile);
+            var response = await service.PostDokumentum(fileName, convertedFile, cancellationToken);
 
             // Assert
             Assert.False(response.Item1);
@@ -205,9 +211,10 @@ namespace Otp.API.Tests
             
             var fileData = "Lorem ipsum.";
             string convertedFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileData));
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var response = await service.PostDokumentum(relativeFilePath, convertedFile);
+            var response = await service.PostDokumentum(relativeFilePath, convertedFile, cancellationToken);
 
             // Assert
             Assert.False(response.Item1);
@@ -224,9 +231,10 @@ namespace Otp.API.Tests
 
             var fileData = "Lorem ipsum.";
             string convertedFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileData));
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var response = await service.PostDokumentum(relativeFilePath, convertedFile);
+            var response = await service.PostDokumentum(relativeFilePath, convertedFile, cancellationToken);
 
             // Assert
             Assert.False(response.Item1);
@@ -251,9 +259,10 @@ namespace Otp.API.Tests
 
             var fileData = "Lorem ipsum.";
             string convertedFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileData));
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var response = await service.PostDokumentum(fileName, convertedFile);
+            var response = await service.PostDokumentum(fileName, convertedFile, cancellationToken);
 
             // Assert
             Assert.True(response.Item1);
@@ -268,9 +277,10 @@ namespace Otp.API.Tests
             var service = new DokumentumokService(_options.Object, fileSystem);
             string fileName = "test.txt";
             string convertedFile = "";
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var response = await service.PostDokumentum(fileName, convertedFile);
+            var response = await service.PostDokumentum(fileName, convertedFile, cancellationToken);
 
             // Assert
             Assert.True(response.Item1);
@@ -285,9 +295,10 @@ namespace Otp.API.Tests
             var service = new DokumentumokService(_options.Object, fileSystem);
             string fileName = "test.txt";
             string wrongConvertedFile = "AAAAAAA";
+            var cancellationToken = new CancellationToken();
 
             // Act
-            var response = await service.PostDokumentum(fileName, wrongConvertedFile);
+            var response = await service.PostDokumentum(fileName, wrongConvertedFile, cancellationToken);
 
             // Assert
             Assert.False(response.Item1);

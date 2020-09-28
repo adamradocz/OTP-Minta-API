@@ -7,6 +7,7 @@
 - `DokumentumokController` tesztek hozzáadva.
 - `DokumentumokService` tesztek párhuzamos futtatásra optimalizálva.
 - `FileProcessor` .NET Standard Library hozzáadva, hogy a kódolás könnyen cserélhető legyen más formátumra.
+- `CancellationToken` használatának a lehetősége az API oldalon, dokumentumok feltöltése és letöltése esetén.
 
 ## Követelmények
 

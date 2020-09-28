@@ -6,6 +6,7 @@ using System.IO.Abstractions;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Otp.WindowsForms.Presenters
@@ -55,7 +56,7 @@ namespace Otp.WindowsForms.Presenters
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                await FileProcessor.Encoder.DecodeFromBase64Async(_fileSystem, _view.DownloadFilePath, content);
+                await FileProcessor.Encoder.DecodeFromBase64Async(_fileSystem, _view.DownloadFilePath, content, CancellationToken.None);
                 _view.Messages = new string[] { $"Fájl mentése sikerült: {_view.DownloadFilePath}" };
             }
             else
@@ -98,7 +99,7 @@ namespace Otp.WindowsForms.Presenters
                 return;
             }
 
-            var convertedData = await FileProcessor.Encoder.EncodeToBase64Async(_fileSystem, _view.UploadFilePath);
+            var convertedData = await FileProcessor.Encoder.EncodeToBase64Async(_fileSystem, _view.UploadFilePath, CancellationToken.None);
             var stringContent = new StringContent(JsonSerializer.Serialize(convertedData), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _client.PostAsync(_view.ApiAddress, stringContent);
